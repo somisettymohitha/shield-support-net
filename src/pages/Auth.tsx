@@ -9,44 +9,120 @@ import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+type AuthView = "signin" | "signup" | "forgot" | "reset";
+
 const Auth = () => {
   const [searchParams] = useSearchParams();
-  const [isSignup, setIsSignup] = useState(searchParams.get("tab") === "signup");
+  const [view, setView] = useState<AuthView>(
+    searchParams.get("tab") === "signup" ? "signup" : "signin"
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("victim");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Check if this is a password recovery redirect
+  useState(() => {
+    const hash = window.location.hash;
+    if (hash.includes("type=recovery")) {
+      setView("reset");
+    }
+  });
+
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      if (isSignup) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { full_name: fullName, role },
-          },
-        });
-        if (error) throw error;
-        toast({ title: "Account created!", description: "You can now sign in with your credentials." });
-        setIsSignup(false);
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast({ title: "Welcome back!" });
-        navigate("/dashboard");
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast({ title: "Welcome back!" });
+      navigate("/dashboard");
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: { full_name: fullName, role },
+        },
+      });
+      if (error) throw error;
+      toast({ title: "Account created!", description: "You can now sign in with your credentials." });
+      setView("signin");
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth#type=recovery`,
+      });
+      if (error) throw error;
+      toast({
+        title: "Reset link sent!",
+        description: "Check your email for a password reset link.",
+      });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      toast({ title: "Password updated!", description: "You can now sign in with your new password." });
+      setView("signin");
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getTitle = () => {
+    switch (view) {
+      case "signup": return "Create Your Account";
+      case "forgot": return "Forgot Password";
+      case "reset": return "Set New Password";
+      default: return "Welcome Back";
+    }
+  };
+
+  const getDescription = () => {
+    switch (view) {
+      case "signup": return "Sign up to access support resources and connect with professionals.";
+      case "forgot": return "Enter your email and we'll send you a reset link.";
+      case "reset": return "Enter your new password below.";
+      default: return "Sign in to continue to your dashboard.";
     }
   };
 
@@ -55,79 +131,105 @@ const Auth = () => {
       <div className="min-h-[80vh] flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="font-heading text-2xl">
-              {isSignup ? "Create Your Account" : "Welcome Back"}
-            </CardTitle>
-            <CardDescription>
-              {isSignup
-                ? "Sign up to access support resources and connect with professionals."
-                : "Sign in to continue to your dashboard."}
-            </CardDescription>
+            <CardTitle className="font-heading text-2xl">{getTitle()}</CardTitle>
+            <CardDescription>{getDescription()}</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {isSignup && (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Your name"
-                      required
-                    />
+            {/* Sign In */}
+            {view === "signin" && (
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <button type="button" onClick={() => setView("forgot")} className="text-xs text-primary hover:underline">
+                      Forgot password?
+                    </button>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="role">I am a</Label>
-                    <Select value={role} onValueChange={setRole}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="victim">Victim / Survivor</SelectItem>
-                        <SelectItem value="counsellor">Counsellor</SelectItem>
-                        <SelectItem value="legal_advisor">Legal Advisor</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </>
-              )}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={6}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Please wait..." : isSignup ? "Create Account" : "Sign In"}
-              </Button>
-            </form>
+                  <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Please wait..." : "Sign In"}
+                </Button>
+              </form>
+            )}
+
+            {/* Sign Up */}
+            {view === "signup" && (
+              <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input id="fullName" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your name" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="role">I am a</Label>
+                  <Select value={role} onValueChange={setRole}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="victim">Victim / Survivor</SelectItem>
+                      <SelectItem value="counsellor">Counsellor</SelectItem>
+                      <SelectItem value="legal_advisor">Legal Advisor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Please wait..." : "Create Account"}
+                </Button>
+              </form>
+            )}
+
+            {/* Forgot Password */}
+            {view === "forgot" && (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Sending..." : "Send Reset Link"}
+                </Button>
+              </form>
+            )}
+
+            {/* Reset Password */}
+            {view === "reset" && (
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password">New Password</Label>
+                  <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Updating..." : "Update Password"}
+                </Button>
+              </form>
+            )}
+
+            {/* Footer links */}
             <div className="mt-4 text-center text-sm text-muted-foreground">
-              {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
-              <button
-                onClick={() => setIsSignup(!isSignup)}
-                className="text-primary font-medium hover:underline"
-              >
-                {isSignup ? "Sign In" : "Sign Up"}
-              </button>
+              {view === "signin" && (
+                <>Don't have an account?{" "}<button onClick={() => setView("signup")} className="text-primary font-medium hover:underline">Sign Up</button></>
+              )}
+              {view === "signup" && (
+                <>Already have an account?{" "}<button onClick={() => setView("signin")} className="text-primary font-medium hover:underline">Sign In</button></>
+              )}
+              {(view === "forgot" || view === "reset") && (
+                <button onClick={() => setView("signin")} className="text-primary font-medium hover:underline">Back to Sign In</button>
+              )}
             </div>
           </CardContent>
         </Card>
