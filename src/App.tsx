@@ -31,6 +31,7 @@ const App = () => (
           <Route path="/contact-police" element={<ContactPolice />} />
           <Route path="/counseling" element={<Counseling />} />
           <Route path="/resources" element={<Resources />} />
+          <Route path="/tracker" element={<Tracker />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
