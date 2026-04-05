@@ -10,6 +10,7 @@ const navLinks = [
   { to: "/contact-police", label: "Contact Police" },
   { to: "/counseling", label: "Counseling" },
   { to: "/resources", label: "Resources" },
+  { to: "/tracker", label: "Tracker" },
 ];
 
 const Navbar = () => {

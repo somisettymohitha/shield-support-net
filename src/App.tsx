@@ -11,6 +11,7 @@ import FileFIR from "./pages/FileFIR";
 import ContactPolice from "./pages/ContactPolice";
 import Counseling from "./pages/Counseling";
 import Resources from "./pages/Resources";
+import Tracker from "./pages/Tracker";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
