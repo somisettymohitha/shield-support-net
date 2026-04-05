@@ -14,16 +14,221 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cases: {
+        Row: {
+          assigned_counsellor_id: string | null
+          assigned_legal_advisor_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          priority: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_counsellor_id?: string | null
+          assigned_legal_advisor_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_counsellor_id?: string | null
+          assigned_legal_advisor_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      counseling_sessions: {
+        Row: {
+          completed_at: string | null
+          counsellor_id: string | null
+          created_at: string
+          id: string
+          progress_notes: string | null
+          scheduled_at: string | null
+          session_type: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          counsellor_id?: string | null
+          created_at?: string
+          id?: string
+          progress_notes?: string | null
+          scheduled_at?: string | null
+          session_type: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          counsellor_id?: string | null
+          created_at?: string
+          id?: string
+          progress_notes?: string | null
+          scheduled_at?: string | null
+          session_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      evidence_uploads: {
+        Row: {
+          case_id: string | null
+          created_at: string
+          description: string | null
+          file_name: string
+          file_path: string
+          file_type: string
+          id: string
+          review_status: string
+          user_id: string
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_type: string
+          id?: string
+          review_status?: string
+          user_id: string
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_type?: string
+          id?: string
+          review_status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_uploads_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      safety_checkins: {
+        Row: {
+          created_at: string
+          id: string
+          is_location_safe: boolean
+          mood: string
+          notes: string | null
+          safety_level: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_location_safe?: boolean
+          mood: string
+          notes?: string | null
+          safety_level: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_location_safe?: boolean
+          mood?: string
+          notes?: string | null
+          safety_level?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "victim" | "counsellor" | "legal_advisor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +355,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "victim", "counsellor", "legal_advisor"],
+    },
   },
 } as const
