@@ -11,6 +11,7 @@ import FileFIR from "./pages/FileFIR";
 import ContactPolice from "./pages/ContactPolice";
 import Counseling from "./pages/Counseling";
 import Resources from "./pages/Resources";
+import Tracker from "./pages/Tracker";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/contact-police" element={<ContactPolice />} />
           <Route path="/counseling" element={<Counseling />} />
           <Route path="/resources" element={<Resources />} />
+          <Route path="/tracker" element={<Tracker />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
