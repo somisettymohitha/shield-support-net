@@ -213,7 +213,7 @@ const FileFIR = () => {
                   <p className="text-sm text-destructive">{locationError}</p>
                 )}
                 {location && (
-                  <div className="bg-muted rounded-lg p-4 space-y-2">
+                  <div className="bg-muted rounded-lg p-4 space-y-3">
                     <div className="flex items-center gap-2 text-sm">
                       <CheckCircle className="w-4 h-4 text-primary" />
                       <span className="font-medium">Location captured</span>
@@ -221,6 +221,18 @@ const FileFIR = () => {
                     <p className="text-xs text-muted-foreground">
                       Latitude: {location.lat.toFixed(6)} | Longitude: {location.lng.toFixed(6)}
                     </p>
+                    {/* Map visualization */}
+                    <div className="rounded-lg overflow-hidden border border-border">
+                      <iframe
+                        title="Your Location"
+                        width="100%"
+                        height="250"
+                        style={{ border: 0 }}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${location.lng - 0.01},${location.lat - 0.01},${location.lng + 0.01},${location.lat + 0.01}&layer=mapnik&marker=${location.lat},${location.lng}`}
+                      />
+                    </div>
                     <a
                       href={`https://www.google.com/maps?q=${location.lat},${location.lng}`}
                       target="_blank"
