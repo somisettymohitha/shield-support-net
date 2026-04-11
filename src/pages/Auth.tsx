@@ -20,6 +20,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [role, setRole] = useState("victim");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
