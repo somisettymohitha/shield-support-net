@@ -14,6 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
+      advocates: {
+        Row: {
+          bio: string | null
+          created_at: string
+          email: string | null
+          experience_years: number
+          id: string
+          is_available: boolean
+          name: string
+          phone: string | null
+          photo_url: string | null
+          specialization: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          experience_years?: number
+          id?: string
+          is_available?: boolean
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          specialization: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          experience_years?: number
+          id?: string
+          is_available?: boolean
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          specialization?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      appointments: {
+        Row: {
+          advocate_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          scheduled_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          advocate_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          scheduled_at: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          advocate_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          scheduled_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_advocate_id_fkey"
+            columns: ["advocate_id"]
+            isOneToOne: false
+            referencedRelation: "advocates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cases: {
         Row: {
           assigned_counsellor_id: string | null
