@@ -58,7 +58,7 @@ const Auth = () => {
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { full_name: fullName, role },
+          data: { full_name: fullName, role, phone },
         },
       });
       if (error) throw error;
@@ -164,6 +164,10 @@ const Auth = () => {
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name</Label>
                   <Input id="fullName" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your name" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 9876543210" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">I am a</Label>
