@@ -13,6 +13,7 @@ import Counseling from "./pages/Counseling";
 import Resources from "./pages/Resources";
 import Tracker from "./pages/Tracker";
 import Advocates from "./pages/Advocates";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/resources" element={<Resources />} />
           <Route path="/tracker" element={<Tracker />} />
           <Route path="/advocates" element={<Advocates />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
