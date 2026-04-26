@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +24,10 @@ const Auth = () => {
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("victim");
   const [loading, setLoading] = useState(false);
+  const [signInMethod, setSignInMethod] = useState<"email" | "phone">("email");
+  const [phoneLogin, setPhoneLogin] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -39,6 +44,40 @@ const Auth = () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast({ title: "Welcome back!" });
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ phone: phoneLogin });
+      if (error) throw error;
+      setOtpSent(true);
+      toast({ title: "Code sent!", description: "Check your phone for the verification code." });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        phone: phoneLogin,
+        token: otpCode,
+        type: "sms",
+      });
       if (error) throw error;
       toast({ title: "Welcome back!" });
       navigate("/dashboard");
@@ -138,24 +177,62 @@ const Auth = () => {
           <CardContent>
             {/* Sign In */}
             {view === "signin" && (
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <button type="button" onClick={() => setView("forgot")} className="text-xs text-primary hover:underline">
-                      Forgot password?
-                    </button>
-                  </div>
-                  <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Please wait..." : "Sign In"}
-                </Button>
-              </form>
+              <Tabs value={signInMethod} onValueChange={(v) => { setSignInMethod(v as "email" | "phone"); setOtpSent(false); }} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="email">Email</TabsTrigger>
+                  <TabsTrigger value="phone">Phone</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="email">
+                  <form onSubmit={handleSignIn} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="password">Password</Label>
+                        <button type="button" onClick={() => setView("forgot")} className="text-xs text-primary hover:underline">
+                          Forgot password?
+                        </button>
+                      </div>
+                      <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
+                    </div>
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading ? "Please wait..." : "Sign In"}
+                    </Button>
+                  </form>
+                </TabsContent>
+
+                <TabsContent value="phone">
+                  {!otpSent ? (
+                    <form onSubmit={handleSendOtp} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="phoneLogin">Phone Number</Label>
+                        <Input id="phoneLogin" type="tel" value={phoneLogin} onChange={e => setPhoneLogin(e.target.value)} placeholder="+91 9876543210" required />
+                        <p className="text-xs text-muted-foreground">Include country code (e.g. +91 for India).</p>
+                      </div>
+                      <Button type="submit" className="w-full" disabled={loading}>
+                        {loading ? "Sending..." : "Send Verification Code"}
+                      </Button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleVerifyOtp} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="otpCode">Verification Code</Label>
+                        <Input id="otpCode" inputMode="numeric" value={otpCode} onChange={e => setOtpCode(e.target.value)} placeholder="6-digit code" required />
+                        <p className="text-xs text-muted-foreground">Sent to {phoneLogin}</p>
+                      </div>
+                      <Button type="submit" className="w-full" disabled={loading}>
+                        {loading ? "Verifying..." : "Verify & Sign In"}
+                      </Button>
+                      <button type="button" onClick={() => { setOtpSent(false); setOtpCode(""); }} className="text-xs text-primary hover:underline w-full text-center">
+                        Use a different number
+                      </button>
+                    </form>
+                  )}
+                </TabsContent>
+              </Tabs>
             )}
 
             {/* Sign Up */}
