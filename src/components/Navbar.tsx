@@ -12,6 +12,7 @@ const navLinks = [
   { to: "/resources", label: "Resources" },
   { to: "/tracker", label: "Tracker" },
   { to: "/advocates", label: "Advocates" },
+  { to: "/doctors", label: "Doctors" },
   { to: "/profile", label: "Profile" },
 ];
 
