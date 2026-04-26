@@ -16,41 +16,59 @@ export type Database = {
     Tables: {
       advocates: {
         Row: {
+          address: string | null
+          availability: string | null
           bio: string | null
+          court: string | null
           created_at: string
           email: string | null
           experience_years: number
+          fees: string | null
           id: string
           is_available: boolean
+          languages: string | null
           name: string
           phone: string | null
           photo_url: string | null
+          qualifications: string | null
           specialization: string
           updated_at: string
         }
         Insert: {
+          address?: string | null
+          availability?: string | null
           bio?: string | null
+          court?: string | null
           created_at?: string
           email?: string | null
           experience_years?: number
+          fees?: string | null
           id?: string
           is_available?: boolean
+          languages?: string | null
           name: string
           phone?: string | null
           photo_url?: string | null
+          qualifications?: string | null
           specialization: string
           updated_at?: string
         }
         Update: {
+          address?: string | null
+          availability?: string | null
           bio?: string | null
+          court?: string | null
           created_at?: string
           email?: string | null
           experience_years?: number
+          fees?: string | null
           id?: string
           is_available?: boolean
+          languages?: string | null
           name?: string
           phone?: string | null
           photo_url?: string | null
+          qualifications?: string | null
           specialization?: string
           updated_at?: string
         }
@@ -172,6 +190,104 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      doctor_appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          created_at: string
+          doctor_id: string
+          id: string
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          created_at?: string
+          doctor_id: string
+          id?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          address: string | null
+          availability: string | null
+          bio: string | null
+          created_at: string
+          email: string | null
+          fees: string | null
+          hospital: string | null
+          id: string
+          languages: string | null
+          name: string
+          phone: string | null
+          qualifications: string | null
+          specialization: string
+          updated_at: string
+          years_experience: number | null
+        }
+        Insert: {
+          address?: string | null
+          availability?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          fees?: string | null
+          hospital?: string | null
+          id?: string
+          languages?: string | null
+          name: string
+          phone?: string | null
+          qualifications?: string | null
+          specialization: string
+          updated_at?: string
+          years_experience?: number | null
+        }
+        Update: {
+          address?: string | null
+          availability?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          fees?: string | null
+          hospital?: string | null
+          id?: string
+          languages?: string | null
+          name?: string
+          phone?: string | null
+          qualifications?: string | null
+          specialization?: string
+          updated_at?: string
+          years_experience?: number | null
         }
         Relationships: []
       }
