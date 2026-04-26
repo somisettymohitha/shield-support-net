@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +14,6 @@ const Profile = () => {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [role, setRole] = useState("victim");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -29,15 +27,14 @@ const Profile = () => {
       setEmail(session.user.email ?? "");
       const { data, error } = await supabase
         .from("profiles")
-        .select("full_name, phone, role")
-        .eq("id", session.user.id)
+        .select("full_name, phone")
+        .eq("user_id", session.user.id)
         .maybeSingle();
       if (error) {
         toast({ title: "Error loading profile", description: error.message, variant: "destructive" });
       } else if (data) {
         setFullName(data.full_name ?? "");
         setPhone(data.phone ?? "");
-        setRole(data.role ?? "victim");
       }
       setLoading(false);
     };
@@ -52,8 +49,8 @@ const Profile = () => {
       if (!session) throw new Error("Not authenticated");
       const { error } = await supabase
         .from("profiles")
-        .update({ full_name: fullName, phone, role })
-        .eq("id", session.user.id);
+        .update({ full_name: fullName, phone })
+        .eq("user_id", session.user.id);
       if (error) throw error;
       toast({ title: "Profile updated" });
     } catch (error: any) {
@@ -87,17 +84,6 @@ const Profile = () => {
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
                   <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 9876543210" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
-                  <Select value={role} onValueChange={setRole}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="victim">Victim / Survivor</SelectItem>
-                      <SelectItem value="counsellor">Counsellor</SelectItem>
-                      <SelectItem value="legal_advisor">Legal Advisor</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
                 <Button type="submit" className="w-full" disabled={saving}>
                   {saving ? "Saving..." : "Save Changes"}
