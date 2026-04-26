@@ -23,6 +23,11 @@ import {
   Clock,
   User,
   Star,
+  GraduationCap,
+  Languages,
+  Building2,
+  Wallet,
+  MapPin,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -152,6 +157,27 @@ const Advocates = () => {
                     {advocate.bio && (
                       <p className="text-sm text-muted-foreground leading-relaxed">{advocate.bio}</p>
                     )}
+
+                    <div className="grid grid-cols-1 gap-1 text-xs text-muted-foreground">
+                      {advocate.qualifications && (
+                        <div className="flex items-start gap-2"><GraduationCap className="w-3.5 h-3.5 mt-0.5 shrink-0" /><span>{advocate.qualifications}</span></div>
+                      )}
+                      {advocate.languages && (
+                        <div className="flex items-start gap-2"><Languages className="w-3.5 h-3.5 mt-0.5 shrink-0" /><span>{advocate.languages}</span></div>
+                      )}
+                      {advocate.court && (
+                        <div className="flex items-start gap-2"><Building2 className="w-3.5 h-3.5 mt-0.5 shrink-0" /><span>{advocate.court}</span></div>
+                      )}
+                      {advocate.fees && (
+                        <div className="flex items-start gap-2"><Wallet className="w-3.5 h-3.5 mt-0.5 shrink-0" /><span>{advocate.fees}</span></div>
+                      )}
+                      {advocate.availability && (
+                        <div className="flex items-start gap-2"><Clock className="w-3.5 h-3.5 mt-0.5 shrink-0" /><span>{advocate.availability}</span></div>
+                      )}
+                      {advocate.address && (
+                        <div className="flex items-start gap-2"><MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0" /><span>{advocate.address}</span></div>
+                      )}
+                    </div>
 
                     <div className="space-y-1">
                       {advocate.phone && (
