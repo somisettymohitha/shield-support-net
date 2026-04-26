@@ -8,11 +8,13 @@ const navLinks = [
   { to: "/know-your-rights", label: "Know Your Rights" },
   { to: "/file-fir", label: "File FIR" },
   { to: "/contact-police", label: "Contact Police" },
+  { to: "/emergency-contact", label: "Emergency" },
   { to: "/counseling", label: "Counseling" },
   { to: "/resources", label: "Resources" },
   { to: "/tracker", label: "Tracker" },
   { to: "/advocates", label: "Advocates" },
   { to: "/doctors", label: "Doctors" },
+  { to: "/doctor-resources", label: "Medical Help" },
   { to: "/profile", label: "Profile" },
 ];
 
