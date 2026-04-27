@@ -293,9 +293,27 @@ const Auth = () => {
                       <Button type="submit" className="w-full" disabled={loading}>
                         {loading ? "Verifying..." : "Verify & Sign In"}
                       </Button>
-                      <button type="button" onClick={() => { setOtpSent(false); setOtpCode(""); }} className="text-xs text-primary hover:underline w-full text-center">
-                        Use a different number
-                      </button>
+                      <div className="flex items-center justify-between text-xs">
+                        <button
+                          type="button"
+                          onClick={() => { setOtpSent(false); setOtpCode(""); setOtpError(null); }}
+                          className="text-primary hover:underline"
+                        >
+                          Use a different number
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleResendOtp}
+                          disabled={resendCooldown > 0 || loading}
+                          className="text-primary hover:underline disabled:text-muted-foreground disabled:no-underline disabled:cursor-not-allowed"
+                        >
+                          {loading
+                            ? "Sending..."
+                            : resendCooldown > 0
+                            ? `Resend in ${resendCooldown}s`
+                            : "Resend code"}
+                        </button>
+                      </div>
                     </form>
                   )}
                 </TabsContent>
