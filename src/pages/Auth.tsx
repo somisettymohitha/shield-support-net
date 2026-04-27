@@ -28,6 +28,7 @@ const Auth = () => {
   const [phoneLogin, setPhoneLogin] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [otpError, setOtpError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -57,13 +58,29 @@ const Auth = () => {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setOtpError(null);
     try {
       const { error } = await supabase.auth.signInWithOtp({ phone: phoneLogin });
       if (error) throw error;
       setOtpSent(true);
       toast({ title: "Code sent!", description: "Check your phone for the verification code." });
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      const msg = (error?.message || "").toLowerCase();
+      const providerNotConfigured =
+        msg.includes("sms") ||
+        msg.includes("provider") ||
+        msg.includes("phone") ||
+        msg.includes("not enabled") ||
+        msg.includes("disabled") ||
+        msg.includes("unsupported") ||
+        error?.status === 422 ||
+        error?.status === 500 ||
+        error?.status === 501;
+      const friendly = providerNotConfigured
+        ? "Phone sign-in isn't available right now because an SMS provider hasn't been set up for this app. Please use email sign-in, or ask the admin to configure an SMS provider (e.g. Twilio) in the backend Auth settings."
+        : error?.message || "Could not send verification code.";
+      setOtpError(friendly);
+      toast({ title: "Couldn't send code", description: friendly, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -72,6 +89,7 @@ const Auth = () => {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setOtpError(null);
     try {
       const { error } = await supabase.auth.verifyOtp({
         phone: phoneLogin,
@@ -82,7 +100,13 @@ const Auth = () => {
       toast({ title: "Welcome back!" });
       navigate("/dashboard");
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      const friendly = error?.message?.includes("expired")
+        ? "That code has expired. Please request a new one."
+        : error?.message?.toLowerCase().includes("invalid")
+        ? "That code didn't match. Double-check and try again."
+        : error?.message || "Could not verify code.";
+      setOtpError(friendly);
+      toast({ title: "Verification failed", description: friendly, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -205,6 +229,20 @@ const Auth = () => {
                 </TabsContent>
 
                 <TabsContent value="phone">
+                  {otpError && (
+                    <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm space-y-2">
+                      <p className="font-medium text-destructive">{otpError}</p>
+                      <details className="text-xs text-muted-foreground">
+                        <summary className="cursor-pointer hover:text-foreground">Troubleshooting tips</summary>
+                        <ul className="mt-2 ml-4 list-disc space-y-1">
+                          <li>Use the <button type="button" className="text-primary underline" onClick={() => { setSignInMethod("email"); setOtpError(null); }}>Email tab</button> to sign in instead.</li>
+                          <li>Make sure your number includes the country code (e.g. <span className="font-mono">+91</span> for India) with no spaces or dashes.</li>
+                          <li>Phone sign-in needs an SMS provider (such as Twilio) configured in the app's backend Auth settings. If you're the admin, enable it in Cloud → Users → Auth Settings → Phone provider.</li>
+                          <li>If a code was sent, it can take up to a minute to arrive. Wait, then request a new one.</li>
+                        </ul>
+                      </details>
+                    </div>
+                  )}
                   {!otpSent ? (
                     <form onSubmit={handleSendOtp} className="space-y-4">
                       <div className="space-y-2">
