@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Upload, FileText, Phone, Heart, Scale, Users, LogOut, ClipboardList } from "lucide-react";
+import { Shield, Upload, FileText, Phone, Heart, Scale, Users, LogOut, ClipboardList, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Layout from "@/components/Layout";
@@ -123,6 +123,15 @@ const Dashboard = () => {
                   <p className="text-sm text-muted-foreground">Pending legal assistance requests will appear here.</p>
                 </CardContent>
               </Card>
+            </div>
+          )}
+
+          {/* Admin Dashboard */}
+          {role === "admin" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <DashCard icon={Smartphone} title="SMS / OTP Status" desc="Check phone OTP provider configuration." color="text-primary" link="/admin/sms-status" />
+              <DashCard icon={Users} title="Support Messages" desc="Review messages survivors have sent." color="text-lavender-dark" link="/emergency-contact" />
+              <DashCard icon={ClipboardList} title="Survivor Intakes" desc="View intake forms submitted by users." color="text-warm-dark" link="/intake" />
             </div>
           )}
         </div>
