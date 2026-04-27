@@ -431,6 +431,78 @@ export type Database = {
         }
         Relationships: []
       }
+      survivor_intakes: {
+        Row: {
+          additional_notes: string | null
+          age_range: string | null
+          completed: boolean
+          created_at: string
+          current_situation: string | null
+          has_children: boolean | null
+          id: string
+          immediate_needs: string[] | null
+          languages: string | null
+          legal_concerns: string | null
+          living_situation: string | null
+          medical_concerns: string | null
+          preferred_contact_time: string | null
+          preferred_name: string | null
+          preferred_session_mode: string | null
+          prior_counseling: boolean | null
+          pronouns: string | null
+          safety_status: string | null
+          support_types_needed: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          age_range?: string | null
+          completed?: boolean
+          created_at?: string
+          current_situation?: string | null
+          has_children?: boolean | null
+          id?: string
+          immediate_needs?: string[] | null
+          languages?: string | null
+          legal_concerns?: string | null
+          living_situation?: string | null
+          medical_concerns?: string | null
+          preferred_contact_time?: string | null
+          preferred_name?: string | null
+          preferred_session_mode?: string | null
+          prior_counseling?: boolean | null
+          pronouns?: string | null
+          safety_status?: string | null
+          support_types_needed?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_notes?: string | null
+          age_range?: string | null
+          completed?: boolean
+          created_at?: string
+          current_situation?: string | null
+          has_children?: boolean | null
+          id?: string
+          immediate_needs?: string[] | null
+          languages?: string | null
+          legal_concerns?: string | null
+          living_situation?: string | null
+          medical_concerns?: string | null
+          preferred_contact_time?: string | null
+          preferred_name?: string | null
+          preferred_session_mode?: string | null
+          prior_counseling?: boolean | null
+          pronouns?: string | null
+          safety_status?: string | null
+          support_types_needed?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
