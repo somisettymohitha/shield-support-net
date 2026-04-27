@@ -10,6 +10,7 @@ const navLinks = [
   { to: "/contact-police", label: "Contact Police" },
   { to: "/emergency-contact", label: "Emergency" },
   { to: "/counseling", label: "Counseling" },
+  { to: "/intake", label: "Intake Form" },
   { to: "/resources", label: "Resources" },
   { to: "/tracker", label: "Tracker" },
   { to: "/advocates", label: "Advocates" },
