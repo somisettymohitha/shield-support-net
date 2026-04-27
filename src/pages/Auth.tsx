@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,7 @@ const Auth = () => {
   const [otpCode, setOtpCode] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -55,14 +56,27 @@ const Auth = () => {
     }
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Cooldown ticker for resend OTP button
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  const sendOtp = async () => {
+    if (!phoneLogin.startsWith("+")) {
+      const msg = "Phone number must start with country code, e.g. +91...";
+      setOtpError(msg);
+      toast({ title: "Invalid number", description: msg, variant: "destructive" });
+      return;
+    }
     setLoading(true);
     setOtpError(null);
     try {
       const { error } = await supabase.auth.signInWithOtp({ phone: phoneLogin });
       if (error) throw error;
       setOtpSent(true);
+      setResendCooldown(45);
       toast({ title: "Code sent!", description: "Check your phone for the verification code." });
     } catch (error: any) {
       const msg = (error?.message || "").toLowerCase();
@@ -76,14 +90,29 @@ const Auth = () => {
         error?.status === 422 ||
         error?.status === 500 ||
         error?.status === 501;
+      const rateLimited = msg.includes("rate") || msg.includes("too many") || error?.status === 429;
       const friendly = providerNotConfigured
         ? "Phone sign-in isn't available right now because an SMS provider hasn't been set up for this app. Please use email sign-in, or ask the admin to configure an SMS provider (e.g. Twilio) in the backend Auth settings."
+        : rateLimited
+        ? "Too many requests. Please wait a minute before trying again."
         : error?.message || "Could not send verification code.";
       setOtpError(friendly);
+      if (rateLimited) setResendCooldown(60);
       toast({ title: "Couldn't send code", description: friendly, variant: "destructive" });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await sendOtp();
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || loading) return;
+    setOtpCode("");
+    await sendOtp();
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
