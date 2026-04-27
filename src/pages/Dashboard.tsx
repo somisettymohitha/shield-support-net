@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Upload, FileText, Phone, Heart, Scale, Users, LogOut } from "lucide-react";
+import { Shield, Upload, FileText, Phone, Heart, Scale, Users, LogOut, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Layout from "@/components/Layout";
@@ -71,6 +71,7 @@ const Dashboard = () => {
               <DashCard icon={Upload} title="Upload Evidence" desc="Securely upload photos or videos as evidence." color="text-lavender-dark" link="/file-fir" />
               <DashCard icon={FileText} title="File an FIR" desc="Step-by-step guide and online portals." color="text-primary" link="/file-fir" />
               <DashCard icon={Phone} title="Contact Police" desc="One-tap emergency calls." color="text-destructive" link="/contact-police" />
+              <DashCard icon={ClipboardList} title="Personal Intake Form" desc="Share details so a counselor can support you better." color="text-primary" link="/intake" />
               <DashCard icon={Heart} title="Request Counseling" desc="Connect with a trauma counsellor." color="text-lavender-dark" link="/counseling" />
               <DashCard icon={Scale} title="Know Your Rights" desc="Indian laws that protect you." color="text-primary" link="/know-your-rights" />
               <DashCard icon={Users} title="Support Resources" desc="Shelters, NGOs, and helplines." color="text-warm-dark" link="/resources" />
