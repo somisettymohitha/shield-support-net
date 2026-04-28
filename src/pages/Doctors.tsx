@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { ContactActions, ConfirmationDialog } from "@/components/ContactActions";
 
 const Doctors = () => {
   const [search, setSearch] = useState("");
@@ -39,6 +40,8 @@ const Doctors = () => {
   const [appointmentTime, setAppointmentTime] = useState("");
   const [appointmentNotes, setAppointmentNotes] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [lastBooking, setLastBooking] = useState<{ name: string; date: string; time: string } | null>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -86,8 +89,15 @@ const Doctors = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Appointment booked successfully!");
+      const doctor = doctors?.find((d) => d.id === selectedDoctor);
+      setLastBooking({
+        name: doctor?.name || "",
+        date: appointmentDate,
+        time: appointmentTime,
+      });
+      toast.success("Appointment request submitted!");
       setDialogOpen(false);
+      setConfirmOpen(true);
       setAppointmentDate("");
       setAppointmentTime("");
       setAppointmentNotes("");
@@ -177,11 +187,6 @@ const Doctors = () => {
                     </div>
 
                     <div className="space-y-1">
-                      {doctor.phone && (
-                        <a href={`tel:${doctor.phone}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
-                          <Phone className="w-4 h-4" /> {doctor.phone}
-                        </a>
-                      )}
                       {doctor.email && (
                         <a href={`mailto:${doctor.email}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
                           <Mail className="w-4 h-4" /> {doctor.email}
@@ -189,7 +194,13 @@ const Doctors = () => {
                       )}
                     </div>
 
-                    <div className="flex items-center justify-end pt-2">
+                    <div className="flex items-center justify-between gap-2 pt-2 flex-wrap">
+                      <ContactActions
+                        recipientName={doctor.name}
+                        recipientService="doctor"
+                        recipientId={doctor.id}
+                        phone={doctor.phone}
+                      />
                       <Dialog open={dialogOpen && selectedDoctor === doctor.id} onOpenChange={(open) => {
                         setDialogOpen(open);
                         if (open) setSelectedDoctor(doctor.id);
@@ -280,6 +291,19 @@ const Doctors = () => {
           )}
         </div>
       </div>
+      {lastBooking && (
+        <ConfirmationDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title="Appointment Requested"
+          details={[
+            { label: "Doctor", value: lastBooking.name },
+            { label: "Date", value: new Date(lastBooking.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) },
+            { label: "Time", value: lastBooking.time },
+            { label: "Status", value: "Pending confirmation" },
+          ]}
+        />
+      )}
     </Layout>
   );
 };
