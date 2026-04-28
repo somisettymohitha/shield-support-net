@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { ContactActions, ConfirmationDialog } from "@/components/ContactActions";
 
 const Advocates = () => {
   const [search, setSearch] = useState("");
@@ -39,6 +40,8 @@ const Advocates = () => {
   const [appointmentTime, setAppointmentTime] = useState("");
   const [appointmentNotes, setAppointmentNotes] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [lastBooking, setLastBooking] = useState<{ name: string; date: string; time: string } | null>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -89,8 +92,15 @@ const Advocates = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Appointment booked successfully!");
+      const advocate = advocates?.find((a) => a.id === selectedAdvocate);
+      setLastBooking({
+        name: advocate?.name || "",
+        date: appointmentDate,
+        time: appointmentTime,
+      });
+      toast.success("Appointment request submitted!");
       setDialogOpen(false);
+      setConfirmOpen(true);
       setAppointmentDate("");
       setAppointmentTime("");
       setAppointmentNotes("");
@@ -180,17 +190,19 @@ const Advocates = () => {
                     </div>
 
                     <div className="space-y-1">
-                      {advocate.phone && (
-                        <a href={`tel:${advocate.phone}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
-                          <Phone className="w-4 h-4" /> {advocate.phone}
-                        </a>
-                      )}
                       {advocate.email && (
                         <a href={`mailto:${advocate.email}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
                           <Mail className="w-4 h-4" /> {advocate.email}
                         </a>
                       )}
                     </div>
+
+                    <ContactActions
+                      recipientName={advocate.name}
+                      recipientService="advocate"
+                      recipientId={advocate.id}
+                      phone={advocate.phone}
+                    />
 
                     <div className="flex items-center justify-between pt-2">
                       <Badge variant={advocate.is_available ? "default" : "outline"}>
