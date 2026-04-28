@@ -396,8 +396,10 @@ export type Database = {
         Row: {
           contact_value: string | null
           created_at: string
+          direction: string
           id: string
           message: string
+          parent_id: string | null
           preferred_contact: string
           recipient_service: string
           status: string
@@ -408,8 +410,10 @@ export type Database = {
         Insert: {
           contact_value?: string | null
           created_at?: string
+          direction?: string
           id?: string
           message: string
+          parent_id?: string | null
           preferred_contact?: string
           recipient_service: string
           status?: string
@@ -420,8 +424,10 @@ export type Database = {
         Update: {
           contact_value?: string | null
           created_at?: string
+          direction?: string
           id?: string
           message?: string
+          parent_id?: string | null
           preferred_contact?: string
           recipient_service?: string
           status?: string
@@ -429,7 +435,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "support_messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       survivor_intakes: {
         Row: {
