@@ -291,6 +291,19 @@ const Doctors = () => {
           )}
         </div>
       </div>
+      {lastBooking && (
+        <ConfirmationDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title="Appointment Requested"
+          details={[
+            { label: "Doctor", value: lastBooking.name },
+            { label: "Date", value: new Date(lastBooking.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) },
+            { label: "Time", value: lastBooking.time },
+            { label: "Status", value: "Pending confirmation" },
+          ]}
+        />
+      )}
     </Layout>
   );
 };
