@@ -16,6 +16,7 @@ const navLinks = [
   { to: "/advocates", label: "Advocates" },
   { to: "/doctors", label: "Doctors" },
   { to: "/doctor-resources", label: "Medical Help" },
+  { to: "/inbox", label: "Messages" },
   { to: "/profile", label: "Profile" },
 ];
 
